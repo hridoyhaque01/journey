@@ -23,7 +23,7 @@ export default function Toast({ type, title }) {
     };
 
     requestAnimationFrame(updateWidth);
-    const timeout = setTimeout(() => setIsVisible(false), 3000);
+    const timeout = setTimeout(() => setIsVisible(false), 1000);
 
     return () => {
       cancelAnimationFrame(updateWidth);
@@ -53,7 +53,7 @@ export default function Toast({ type, title }) {
                   error
                 </span>
               )}
-              <span className="text-base">{title}</span>
+              <span className={`text-base`}>{title}</span>
             </div>
 
             <button className="text-fadeLight flex items-center">

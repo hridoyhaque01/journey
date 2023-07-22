@@ -1,9 +1,11 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 function PrivateRouter({ children }) {
-  const user = false;
+  console.log("true");
+  const { user } = useAuth();
   const location = useLocation();
-  if (user) {
+  if (user?.email) {
     return <>{children}</>; // Wrap children in JSX syntax
   }
 
