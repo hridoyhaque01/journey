@@ -1,37 +1,59 @@
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
   getDocs,
-  updateDoc,
+  setDoc,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
 import "./App.css";
-import { firebaseFirestore } from "./firebase/firebase.config";
+import { firebaseFirestore, storage } from "./firebase/firebase.config";
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [requestLoading, setRequestLoading] = useState(false);
+  const [file, setFile] = useState(null);
+
+  const getImageUrl = async (file) => {
+    try {
+      const storageRef = ref(storage, `files/${Date.now()}-${file?.name}`);
+      const uploadResult = await uploadBytes(storageRef, "files");
+      const downloadUrl = await getDownloadURL(
+        ref(storage, uploadResult?.ref?.fullPath)
+      );
+      return downloadUrl;
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setRequestLoading(true);
     const form = event.target;
     const title = form.title.value;
     const description = form.description.value;
-    const postRef = collection(firebaseFirestore, "posts");
-    setRequestLoading(true);
-    addDoc(postRef, { title, description })
-      .then((res) => {
-        const ref = doc(firebaseFirestore, "posts", res?.id);
-        updateDoc(ref, { id: res?.id }).then((res) => {
-          setRequestLoading(false);
-          setPosts((prev) => [...prev, { id: res?.id, title, description }]);
-          form.reset();
-          console.log(res);
-        });
-      })
+    const timestamp = Date.now().toString();
+    const postRef = doc(firebaseFirestore, "posts", timestamp);
+    getImageUrl(file)
+      .then((res) =>
+        setDoc(postRef, { id: timestamp, title, description, imageUrl: res })
+          .then((res) => {
+            setPosts((prev) => [
+              ...prev,
+              { id: timestamp, title, description, imageUrl: res },
+            ]);
+            setRequestLoading(false);
+            form.reset();
+            console.log(res);
+          })
+          .catch((err) => {
+            setRequestLoading(false);
+            console.log(err);
+          })
+      )
       .catch((err) => {
         setRequestLoading(false);
         console.log(err);
@@ -140,6 +162,9 @@ function App() {
               className="w-80 h-40 border border-slate-300 outline-none p-4 rounded-md"
               required
             />
+          </div>
+          <div>
+            <input type="file" onChange={(e) => setFile(e.target.files[0])} />
           </div>
           <div>
             <button
