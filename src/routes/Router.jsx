@@ -44,6 +44,10 @@ export const routes = createBrowserRouter([
         element: <AddPost></AddPost>,
       },
       {
+        path: "/editPost",
+        element: <AddPost></AddPost>,
+      },
+      {
         path: "/test",
         element: <Test></Test>,
       },

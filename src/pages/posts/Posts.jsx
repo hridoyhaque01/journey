@@ -1,23 +1,89 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import post1 from "../../assets/images/post-1.png";
+import { usePosts } from "../../contexts/postContext";
 
 function Posts() {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all category");
+  const { isLoading, isError, posts } = usePosts();
   const navigate = useNavigate();
 
-  const handleNavigate = () => {
-    navigate("/test", {
+  const handleNavigate = (data, type) => {
+    navigate(`/${type}Post`, {
       state: {
-        payload: [
-          { name: "john", id: 1 },
-          { name: "hank", id: 2 },
-          { name: "john", id: 3 },
-        ],
+        payload: data,
+        type: type,
       },
     });
   };
+
+  let content = null;
+
+  if (isLoading) {
+    content = <div>Loading...</div>;
+  } else if (!isLoading && isError) {
+    content = <div>Somthing went wrong...</div>;
+  } else if (!isLoading && !isError && posts?.length === 0) {
+    content = <div>no data found...</div>;
+  } else if (!isLoading && !isError && posts?.length > 0) {
+    content = (
+      <div className="grid grid-cols-5 gap-6">
+        {posts?.map((post, i) => (
+          <div
+            className="bg-white relative rounded-md overflow-hidden group"
+            key={i}
+            onClick={() => handleNavigate(post, "edit")}
+          >
+            <div>
+              <img src={post1} alt="" className="w-fukk" />
+            </div>
+            <div className="p-4">
+              <h4 className="font-semibold text-lg text-black">
+                Journey to the heven
+              </h4>
+              <p className="text-sm text-fadeReg mt-1">
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint,
+                voluptate labore! Repellat unde earum nesciunt....
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 absolute top-3 right-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-500">
+              <button className="bg-fadeLight w-10 h-10 rounded-full flex items-center justify-center ">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 101 101"
+                  id="edit"
+                  className="w-5 h-5 fill-primaryColor"
+                >
+                  <path d="M82.2 79.2H18.8c-1.3 0-2.4 1.1-2.4 2.4s1.1 2.4 2.4 2.4h63.4c1.3 0 2.4-1.1 2.4-2.4s-1.1-2.4-2.4-2.4zM16.5 58.2l-.1 11.3c0 .6.2 1.3.7 1.7.5.4 1.1.7 1.7.7l11.3-.1c.6 0 1.2-.3 1.7-.7l38.8-38.8c.9-.9.9-2.5 0-3.4L59.4 17.7c-.9-.9-2.5-.9-3.4 0l-7.8 7.8-31 31c-.5.5-.7 1.1-.7 1.7zm49-27.6L61.1 35l-7.8-7.8 4.4-4.4 7.8 7.8zM21.3 59.2l28.6-28.6 7.8 7.8L29.1 67h-7.8v-7.8z"></path>
+                </svg>
+              </button>
+              <button className="bg-fadeLight w-10 h-10 rounded-full flex items-center justify-center ">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  id="delete"
+                  className="w-5 h-5"
+                >
+                  <g fill="none" fillRule="evenodd" stroke="#ff3333">
+                    <path d="M5.5 7.5V20A1.5 1.5 0 0 0 7 21.5h11a1.5 1.5 0 0 0 1.5-1.5V7.5h-14z"></path>
+                    <path
+                      strokeLinecap="round"
+                      d="M8.5 10.41v8.18M12.5 10.41v8.18M16.5 10.41v8.18M9 4.333V3.244C9 2.557 9.627 2 10.4 2h4.2c.773 0 1.4.557 1.4 1.244v1.09"
+                    ></path>
+                    <rect width="18" height="3" x="3.5" y="4.5" rx="1.5"></rect>
+                  </g>
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  console.log(posts);
+
   return (
     <section className="p-10 h-full overflow-auto">
       <div className="flex items-center justify-between">
@@ -122,57 +188,11 @@ function Posts() {
           </div>
         </div>
       </div>
-      <div className="mt-20">
-        <div className="grid grid-cols-5">
-          <div className="bg-white relative rounded-md overflow-hidden group">
-            <div>
-              <img src={post1} alt="" className="w-fukk" />
-            </div>
-            <div className="p-4">
-              <h4 className="font-semibold text-lg text-black">
-                Journey to the heven
-              </h4>
-              <p className="text-sm text-fadeReg mt-1">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint,
-                voluptate labore! Repellat unde earum nesciunt....
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 absolute top-3 right-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-500">
-              <button className="bg-fadeLight w-10 h-10 rounded-full flex items-center justify-center ">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 101 101"
-                  id="edit"
-                  className="w-5 h-5 fill-primaryColor"
-                >
-                  <path d="M82.2 79.2H18.8c-1.3 0-2.4 1.1-2.4 2.4s1.1 2.4 2.4 2.4h63.4c1.3 0 2.4-1.1 2.4-2.4s-1.1-2.4-2.4-2.4zM16.5 58.2l-.1 11.3c0 .6.2 1.3.7 1.7.5.4 1.1.7 1.7.7l11.3-.1c.6 0 1.2-.3 1.7-.7l38.8-38.8c.9-.9.9-2.5 0-3.4L59.4 17.7c-.9-.9-2.5-.9-3.4 0l-7.8 7.8-31 31c-.5.5-.7 1.1-.7 1.7zm49-27.6L61.1 35l-7.8-7.8 4.4-4.4 7.8 7.8zM21.3 59.2l28.6-28.6 7.8 7.8L29.1 67h-7.8v-7.8z"></path>
-                </svg>
-              </button>
-              <button className="bg-fadeLight w-10 h-10 rounded-full flex items-center justify-center ">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  id="delete"
-                  className="w-5 h-5"
-                >
-                  <g fill="none" fillRule="evenodd" stroke="#ff3333">
-                    <path d="M5.5 7.5V20A1.5 1.5 0 0 0 7 21.5h11a1.5 1.5 0 0 0 1.5-1.5V7.5h-14z"></path>
-                    <path
-                      strokeLinecap="round"
-                      d="M8.5 10.41v8.18M12.5 10.41v8.18M16.5 10.41v8.18M9 4.333V3.244C9 2.557 9.627 2 10.4 2h4.2c.773 0 1.4.557 1.4 1.244v1.09"
-                    ></path>
-                    <rect width="18" height="3" x="3.5" y="4.5" rx="1.5"></rect>
-                  </g>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="mt-20">{content}</div>
 
       <div className="fixed bottom-10 right-10">
         <button
-          onClick={handleNavigate}
+          onClick={() => handleNavigate({}, "add")}
           className="w-14 h-14 rounded-full bg-gradientBg shadow-md flex items-center justify-center cursor-pointer"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" id="add">

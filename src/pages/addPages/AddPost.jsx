@@ -1,13 +1,29 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { imageIcon } from "../../assets/getAssets";
+import PostModal from "../../components/modals/PostModal";
+import { usePosts } from "../../contexts/postContext";
 
 function AddPost() {
   const thumbnailRef = useRef();
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreveiw, setThumbnailPreveiw] = useState(null);
+  const [extra, setExtra] = useState([]);
+  const [isDisabled, setIsDiabled] = useState(false);
+  const navigate = useNavigate();
   const handleDragOver = (event) => {
     event.preventDefault();
   };
+  const {
+    uploadPost,
+    requestLoading,
+    requestSuccess,
+    requestError,
+    post,
+    setPost,
+  } = usePosts();
+  const { state } = useLocation();
+  const { type, payload } = state || {};
 
   const handleDrop = (event) => {
     event.preventDefault();
@@ -33,19 +49,58 @@ function AddPost() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log();
-    alert("submit successfull");
+    const formData = event.target;
+    const title = formData.title.value;
+    const place = formData.place.value;
+    const date = { file: thumbnail, title, place };
+    if (type === "add") {
+      uploadPost(date);
+    }
   };
 
+  useEffect(() => {
+    if (requestSuccess && type !== "edit") {
+      alert("successFully uploade");
+      setIsDiabled(true);
+      console.log(post);
+    } else if (requestError) {
+      alert("something went wrong!");
+    }
+  }, [requestSuccess, requestError, type, post]);
+
+  useEffect(() => {
+    if (requestSuccess) {
+      setExtra({ ...post });
+    }
+  }, [requestSuccess, post]);
+
+  useEffect(() => {
+    if (type === "edit") {
+      setPost(payload);
+      setExtra(payload);
+    }
+  }, [type, setPost]);
+
+  useEffect(() => {
+    if (requestSuccess && type === "edit") {
+      navigate("/editPost", {
+        state: {
+          payload: post,
+          type: "edit",
+        },
+      });
+    }
+  }, [requestSuccess, type]);
+
   return (
-    <section className="p-10 h-full overflow-auto">
-      <div className="bg-white p-8 rounded-md h-full flex flex-col items-center">
+    <section className="p-10 h-full overflow-hidden">
+      <div className="bg-white p-8 rounded-md h-full flex flex-col items-center overflow-auto">
         <div>
           <h2 className="text-black text-3xl font-semibold">
             Add new blog post
           </h2>
         </div>
-        <div className="mt-10 w-8/12">
+        <div className="py-10 w-8/12">
           <form action="#" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2 relative">
@@ -120,15 +175,60 @@ function AddPost() {
                   type="text"
                   className="w-full p-4 rounded-md border border-fadeLight outline-none text-base"
                   placeholder="Enter blog title"
+                  name="title"
+                />
+              </div>
+              <div className="flex flex-col gap-2 relative">
+                <span className="text-sm font-medium">Place</span>
+                <input
+                  type="text"
+                  className="w-full p-4 rounded-md border border-fadeLight outline-none text-base"
+                  placeholder="Enter blog title"
+                  name="place"
                 />
               </div>
             </div>
-            <div>
-              <button type="submit">submit</button>
+            <div className="mt-10">
+              <button
+                type="submit"
+                className="px-6 py-4 bg-primaryColor rounded-md text-lg text-white capitalize"
+                disabled={requestLoading || isDisabled}
+              >
+                Submit
+              </button>
             </div>
           </form>
+
+          <div className="mt-3">
+            <label
+              type="button"
+              className="px-6 py-3 bg-gradientBg rounded-md cursor-pointer"
+              htmlFor="postmodal"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                id="add"
+              >
+                <path fill="none" d="M0 0h24v24H0V0z"></path>
+                <path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z"></path>
+              </svg>
+            </label>
+          </div>
+
+          {extra?.lessons?.map((item, i) => (
+            <div key={i} className="flex items-center gap-5">
+              <div>
+                <img src={item?.thumbnailUrl} alt="" className="w-10 h-10" />
+              </div>
+              <h3>{item?.title}</h3>
+            </div>
+          ))}
         </div>
       </div>
+      <PostModal data={extra} type="add" index="1"></PostModal>
     </section>
   );
 }
