@@ -20,6 +20,7 @@ export default {
 
       white: "#fff",
       whiteLow: "#f2f2f2",
+      whiteLight: "#fafafa",
 
       green: "#6cbaa8",
       greenHigh: "#029664",

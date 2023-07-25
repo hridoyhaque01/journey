@@ -1,10 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import post1 from "../../assets/images/post-1.png";
-import PostModal from "../../components/modals/PostModal";
 
 function Posts() {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all category");
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate("/test", {
+      state: {
+        payload: [
+          { name: "john", id: 1 },
+          { name: "hank", id: 2 },
+          { name: "john", id: 3 },
+        ],
+      },
+    });
+  };
   return (
     <section className="p-10 h-full overflow-auto">
       <div className="flex items-center justify-between">
@@ -158,9 +171,9 @@ function Posts() {
       </div>
 
       <div className="fixed bottom-10 right-10">
-        <label
+        <button
+          onClick={handleNavigate}
           className="w-14 h-14 rounded-full bg-gradientBg shadow-md flex items-center justify-center cursor-pointer"
-          htmlFor="postmodal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" id="add">
             <path
@@ -168,9 +181,8 @@ function Posts() {
               d="M28 15H17V4a1 1 0 0 0-2 0v11H4a1 1 0 0 0 0 2h11v11a1 1 0 0 0 2 0V17h11a1 1 0 0 0 0-2Z"
             ></path>
           </svg>
-        </label>
+        </button>
       </div>
-      <PostModal></PostModal>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import imageIcon from "./images/imageIcon.png";
 import travelLoading from "./images/summer-trip.gif";
 
-export { travelLoading };
+export { imageIcon, travelLoading };
