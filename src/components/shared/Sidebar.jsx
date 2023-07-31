@@ -8,7 +8,10 @@ function Sidebar() {
         <nav className="sidebar">
           <ul className="flex flex-col">
             <li>
-              <NavLink to="/" className="flex items-center py-4 px-6 gap-1">
+              <NavLink
+                to="/dashboard"
+                className="flex items-center py-4 px-6 gap-1"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
