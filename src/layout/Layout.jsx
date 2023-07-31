@@ -9,25 +9,31 @@ function Layout() {
 
   // console.log(location);
 
-  const permissons = useMemo(() => [], []);
+  const permissons = useMemo(() => ["users", "posts"], []);
 
   useEffect(() => {
     const path = localStorage.getItem("location");
+    console.log(path);
     if (path) {
       navigate(`/${path}`);
+      // console.log
     } else if (permissons?.length > 0) {
       navigate(`/${permissons[0]}`);
-    } else if (permissons?.length === 0) {
-      navigate(`/404`);
     }
   }, [navigate, permissons]);
 
   useEffect(() => {
     const path = location.pathname.substring(1);
+    console.log(path);
     if (permissons?.includes(path)) {
       localStorage.setItem("location", path);
+    } else if (permissons?.length > 0 && path === "") {
+      navigate(`/${permissons[0]}`);
+      // localStorage.setItem("location", permissons[0]);
+    } else {
+      navigate(`/404`);
     }
-  }, [location.pathname, permissons]);
+  }, [location.pathname, permissons, navigate]);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-whiteLow">
