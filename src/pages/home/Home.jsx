@@ -1,10 +1,24 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  const navigate = useNavigate();
+  const { sortedPermissions } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = location?.pathname.substring(1);
+    if (sortedPermissions?.includes(path)) {
+      navigate(`/${path}`);
+      localStorage.setItem("location", path);
+    } else {
+      navigate("/404");
+    }
+  }, [location?.pathname, navigate, sortedPermissions]);
 
   const { logout } = useAuth();
 

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import post1 from "../../assets/images/post-1.png";
+import { useAuth } from "../../contexts/AuthContext";
 import { usePosts } from "../../contexts/postContext";
 
 function Posts() {
@@ -8,6 +9,8 @@ function Posts() {
   const [selectedCategory, setSelectedCategory] = useState("all category");
   const { isLoading, isError, posts } = usePosts();
   const navigate = useNavigate();
+  const { sortedPermissions } = useAuth();
+  const location = useLocation();
 
   const handleNavigate = (data, type) => {
     navigate(`/${type}Post`, {
@@ -17,6 +20,16 @@ function Posts() {
       },
     });
   };
+
+  useEffect(() => {
+    const path = location?.pathname.substring(1);
+    if (sortedPermissions?.includes(path)) {
+      navigate(`/${path}`);
+      localStorage.setItem("location", path);
+    } else {
+      navigate("/404");
+    }
+  }, [location?.pathname, navigate, sortedPermissions]);
 
   let content = null;
 
@@ -81,8 +94,6 @@ function Posts() {
       </div>
     );
   }
-
-  console.log(posts);
 
   return (
     <section className="p-10 h-full overflow-auto">

@@ -15,6 +15,15 @@ export function useAuth() {
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState();
+  const [permissions, setPermissions] = useState([
+    "2users",
+    "3posts",
+    "1dashboard",
+  ]);
+
+  const sortedPermissions = permissions
+    ?.map((permission) => permission.slice(1))
+    .sort();
 
   useEffect(() => {
     const auth = getAuth();
@@ -41,6 +50,8 @@ export const AuthProvider = ({ children }) => {
     login,
     user,
     logout,
+    permissions,
+    sortedPermissions,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -2,7 +2,6 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function PrivateRouter({ children }) {
-  console.log("true");
   const { user } = useAuth();
   const location = useLocation();
   if (user?.email) {

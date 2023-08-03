@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { imageIcon } from "../../assets/getAssets";
 import PostModal from "../../components/modals/PostModal";
+import { useAuth } from "../../contexts/AuthContext";
 import { usePosts } from "../../contexts/postContext";
 
 function AddPost() {
@@ -10,10 +11,14 @@ function AddPost() {
   const [thumbnailPreveiw, setThumbnailPreveiw] = useState(null);
   const [extra, setExtra] = useState([]);
   const [isDisabled, setIsDiabled] = useState(false);
+  const { state } = useLocation();
   const navigate = useNavigate();
+  const { sortedPermissions } = useAuth();
+
   const handleDragOver = (event) => {
     event.preventDefault();
   };
+
   const {
     uploadPost,
     requestLoading,
@@ -22,7 +27,6 @@ function AddPost() {
     post,
     setPost,
   } = usePosts();
-  const { state } = useLocation();
   const { type, payload } = state || {};
 
   const handleDrop = (event) => {
@@ -91,6 +95,15 @@ function AddPost() {
       });
     }
   }, [requestSuccess, type]);
+
+  useEffect(() => {
+    if (sortedPermissions?.includes("posts")) {
+      navigate(`/addPost`);
+      localStorage.setItem("location", "addPost");
+    } else {
+      navigate("/404");
+    }
+  }, [navigate, sortedPermissions]);
 
   return (
     <section className="p-10 h-full overflow-hidden">
